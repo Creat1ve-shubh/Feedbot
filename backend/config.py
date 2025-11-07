@@ -13,6 +13,8 @@ class Settings:
     DB_NAME = os.getenv("DB_NAME", "branddb")
     DB_USER = os.getenv("DB_USER", "postgres")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+    # Optional full URL override (e.g., sqlite:///./dev.db)
+    DB_URL_OVERRIDE = os.getenv("DB_URL")
 
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
@@ -27,6 +29,8 @@ class Settings:
 
     @property
     def DB_URL(self) -> str:
+        if self.DB_URL_OVERRIDE:
+            return self.DB_URL_OVERRIDE
         return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 settings = Settings()
