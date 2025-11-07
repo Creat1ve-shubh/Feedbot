@@ -1,0 +1,24 @@
+fastapi==0.115.2
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+SQLAlchemy==2.0.36
+psycopg2-binary==2.9.9
+alembic==1.13.2
+
+redis==5.0.8
+celery==5.4.0
+
+httpx==0.27.2
+beautifulsoup4==4.12.3
+
+# Reddit + Twitter API clients (optional; you can swap for your own)
+praw==7.7.1
+tweepy==4.14.0
+
+# ML deps (keep light; replace with your real stack when ready)
+torch==2.3.1
+transformers==4.44.0
+scikit-learn==1.6.1
+pandas==2.2.3
+numpy==1.26.4
