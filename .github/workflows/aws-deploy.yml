@@ -94,7 +94,7 @@ jobs:
           image: ${{ needs.build-and-push.outputs.api-image }}
       
       - name: Deploy ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def-api.outputs.task-definition }}
           service: feedbot-api-service
@@ -126,7 +126,7 @@ jobs:
           image: ${{ needs.build-and-push.outputs.worker-image }}
       
       - name: Deploy ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def-worker.outputs.task-definition }}
           service: feedbot-worker-service
