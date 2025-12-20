@@ -4,7 +4,7 @@ pydantic==2.9.2
 python-dotenv==1.0.1
 SQLAlchemy==2.0.36
 # Use psycopg2-binary for Python 3.11 (has prebuilt wheels)
-psycopg2-binary==2.9.10
+psycopg2-binary==2.9.11
 alembic==1.13.2
 
 redis==5.0.8
