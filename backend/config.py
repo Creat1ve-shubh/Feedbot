@@ -25,7 +25,13 @@ class Settings:
     TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN", "")
 
     ML_BASE_MODEL = os.getenv("ML_BASE_MODEL", "distilbert-base-uncased-finetuned-sst-2-english")
-    ML_MODEL_PATH = os.getenv("ML_MODEL_PATH", "./models/model_traced.pt")
+    # Normalize model path for container usage
+    _raw_model_path = os.getenv("ML_MODEL_PATH", "./models/model_traced.pt")
+    if _raw_model_path.lower().startswith("backend\\models\\"):
+        # Convert host Windows path to container-relative path
+        ML_MODEL_PATH = "./models/" + _raw_model_path.split("\\")[-1]
+    else:
+        ML_MODEL_PATH = _raw_model_path
 
     @property
     def DB_URL(self) -> str:

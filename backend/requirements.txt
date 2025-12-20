@@ -3,7 +3,8 @@ uvicorn[standard]==0.30.6
 pydantic==2.9.2
 python-dotenv==1.0.1
 SQLAlchemy==2.0.36
-psycopg2-binary==2.9.9
+# Use psycopg2-binary for Python 3.11 (has prebuilt wheels)
+psycopg2-binary==2.9.10
 alembic==1.13.2
 
 redis==5.0.8
@@ -17,8 +18,11 @@ praw==7.7.1
 tweepy==4.14.0
 
 # ML deps (keep light; replace with your real stack when ready)
-torch==2.3.1
-transformers==4.44.0
+# Torch CPU-only (much smaller than CUDA version)
+# For GPU: pip install torch==2.9.0 --index-url https://download.pytorch.org/whl/cu121
+# torch==2.9.0+cpu  # Installed separately in Dockerfile
+# transformers==4.44.0  # Installed separately in Dockerfile
 scikit-learn==1.6.1
 pandas==2.2.3
-numpy==1.26.4
+# NumPy 2.x for Python 3.13 compatibility
+numpy==2.2.0

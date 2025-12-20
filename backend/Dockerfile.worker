@@ -2,9 +2,29 @@ FROM python:3.11-slim
 
 WORKDIR /app
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install base deps with longer timeout
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=300
+RUN pip install --no-cache-dir --prefer-binary --index-url https://download.pytorch.org/whl/cpu \
+    torch==2.9.0+cpu && \
+    pip install --no-cache-dir --prefer-binary -r requirements.txt && \
+    pip install --no-cache-dir --prefer-binary "transformers==4.44.0"
 
 COPY . .
 
-ENV PYTHONUNBUFFERED=1
-CMD ["celery", "-A", "workers.tasks.celery", "worker", "--loglevel=info", "-Q", "celery"]
+ENV HF_HOME=/app/.cache/huggingface
+RUN python - <<'PY'
+import os
+os.makedirs(os.environ.get('HF_HOME','/app/.cache/huggingface'), exist_ok=True)
+from transformers import AutoTokenizer, pipeline
+model_id = "distilbert-base-uncased-finetuned-sst-2-english"
+# Warm tokenizers & model cache to avoid first-run downloads
+tok = AutoTokenizer.from_pretrained(model_id)
+pipe = pipeline("text-classification", model=model_id, device=-1)
+print("Prefetched model:", model_id)
+PY
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+CMD ["celery", "-A", "celery_app.celery", "worker", "--loglevel=info", "-Q", "celery"]

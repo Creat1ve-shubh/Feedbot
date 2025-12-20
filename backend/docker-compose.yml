@@ -16,6 +16,10 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     env_file: .env
+    environment:
+      - ML_MODEL_PATH=./models/model_traced.pt
+    volumes:
+      - ./models:/app/models:ro
     depends_on:
       - redis
       - postgres
