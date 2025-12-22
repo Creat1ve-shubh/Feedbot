@@ -8,6 +8,10 @@ import {
   IconDatabase,
   IconAlertCircle,
 } from "@tabler/icons-react";
+import AnimatedArchitectureDiagram from "./AnimatedArchitectureDiagram";
+import LiveMetricsDashboard from "./LiveMetricsDashboard";
+import InteractivePipeline from "./InteractivePipeline";
+import TechStackShowcase from "./TechStackShowcase";
 
 const features = [
   {
@@ -144,61 +148,21 @@ export default function TechnicalDetailsSection() {
             );
           })}
         </motion.div>
+      </div>
 
-        {/* Architecture Overview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="bg-[#0b0b0b] text-white rounded-2xl p-12"
-        >
-          <h3 className="text-3xl font-serif mb-8">System Architecture</h3>
+      {/* Enhanced Interactive Components */}
+      <div>
+        {/* Live Metrics Dashboard */}
+        <LiveMetricsDashboard />
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              {
-                title: "Scrapers",
-                desc: "Reddit & Twitter",
-                items: ["Real-time feeds", "Multi-platform", "Rate limiting"],
-              },
-              {
-                title: "Backend",
-                desc: "FastAPI",
-                items: ["REST API", "WebSocket support", "Authentication"],
-              },
-              {
-                title: "ML Pipeline",
-                desc: "PyTorch + Transformers",
-                items: [
-                  "Model inference",
-                  "Batch processing",
-                  "Feature extraction",
-                ],
-              },
-              {
-                title: "Infra",
-                desc: "Docker + AWS",
-                items: ["Postgres DB", "Redis cache", "ECS Fargate"],
-              },
-            ].map((component, idx) => (
-              <div
-                key={idx}
-                className="bg-white/10 rounded-xl p-6 border border-white/20 hover:border-white/40 transition-colors"
-              >
-                <h4 className="font-serif text-xl mb-1">{component.title}</h4>
-                <p className="text-sm text-gray-300 mb-4">{component.desc}</p>
-                <ul className="space-y-2">
-                  {component.items.map((item, i) => (
-                    <li key={i} className="text-sm text-gray-400">
-                      ✓ {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        {/* Interactive Architecture Diagram */}
+        <AnimatedArchitectureDiagram />
+
+        {/* Interactive ML Pipeline */}
+        <InteractivePipeline />
+
+        {/* Tech Stack Showcase */}
+        <TechStackShowcase />
       </div>
     </section>
   );

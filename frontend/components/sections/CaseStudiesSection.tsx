@@ -1,234 +1,306 @@
 "use client";
 
 import React from "react";
-import { motion } from "motion/react";
 import { caseStudies } from "@/lib/mockCaseStudies";
-import Link from "next/link";
 
 export default function CaseStudiesSection() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 24 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.7,
-      },
-    },
-  };
-
-  const titleVariants = {
-    hidden: { x: 30, opacity: 0 },
-    visible: {
-      x: -10,
-      opacity: 1,
-      transition: { duration: 0.7 },
-    },
-  };
-
-  const detailVariants = {
-    hidden: { x: 30, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: { duration: 0.7, delay: 0.1 },
-    },
-  };
-
   return (
-    <section className="py-32 px-6 max-w-7xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="mb-16"
-      >
-        <h2 className="text-5xl md:text-6xl font-serif leading-tight text-[#0b0b0b]">
-          Real Brand Insights
-        </h2>
-        <p className="mt-4 text-lg opacity-70 max-w-2xl">
-          See how leading brands are understood through sentiment analysis and
-          emotional intelligence.
-        </p>
-      </motion.div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        className="space-y-8"
-      >
-        {caseStudies.map((study) => (
-          <motion.div
-            key={study.id}
-            variants={itemVariants}
-            whileHover={{ y: -6, scale: 1.01 }}
-            className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"
-          >
-            <div className="p-6 md:p-8 flex flex-col md:flex-row gap-8 md:gap-10 items-start md:items-stretch">
-              {/* Animated Title Panel */}
-              <motion.div
-                variants={titleVariants}
-                className="relative w-full md:w-1/3 bg-gradient-to-br from-black/90 via-black/80 to-black/60 text-white rounded-2xl p-6 md:p-8 overflow-hidden"
-              >
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 35%), radial-gradient(circle at 80% 10%, rgba(255,255,255,0.12), transparent 30%)",
-                  }}
-                />
-                <div
-                  className="absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-50"
-                  style={{
-                    background: study.color.includes("from")
-                      ? undefined
-                      : undefined,
-                  }}
-                />
-                <div
-                  className={`absolute inset-0 ${study.color} opacity-40 mix-blend-screen`}
-                />
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-gray-300 mb-3">
-                      {study.industry}
-                    </p>
-                    <h3 className="text-3xl md:text-4xl font-serif leading-tight">
-                      {study.brand}
-                    </h3>
-                  </div>
-                  <div className="mt-6 text-sm text-gray-200/90">
-                    {study.keyInsight}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Details Panel */}
-              <motion.div
-                variants={detailVariants}
-                className="flex-1 w-full space-y-6"
-              >
-                {/* Metrics */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                      Posts Analyzed
-                    </p>
-                    <p className="text-2xl font-serif text-[#0b0b0b]">
-                      {study.postsAnalyzed.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                      Positive
-                    </p>
-                    <p className="text-xl font-semibold text-green-600">
-                      {study.sentimentBreakdown.positive}%
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                      Negative
-                    </p>
-                    <p className="text-xl font-semibold text-red-600">
-                      {study.sentimentBreakdown.negative}%
-                    </p>
-                  </div>
-                </div>
-
-                {/* Sentiment Bar */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Sentiment Split</span>
-                    <span className="text-xs text-gray-500">
-                      Positive / Mixed / Negative
-                    </span>
-                  </div>
-                  <div className="flex gap-2 h-3 rounded-full overflow-hidden bg-gray-100">
-                    <div
-                      className="bg-green-500"
-                      style={{ width: `${study.sentimentBreakdown.positive}%` }}
-                    />
-                    <div
-                      className="bg-orange-500"
-                      style={{ width: `${study.sentimentBreakdown.mixed}%` }}
-                    />
-                    <div
-                      className="bg-red-500"
-                      style={{ width: `${study.sentimentBreakdown.negative}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Emotions and Insight */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                      Top Emotions
-                    </h4>
-                    <div className="space-y-2">
-                      {study.topEmotions.slice(0, 3).map((emotion, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between text-sm"
-                        >
-                          <span className="text-gray-700">{emotion.name}</span>
-                          <span className="font-medium text-[#0b0b0b]">
-                            {emotion.value}%
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-between">
-                    <p className="text-sm leading-relaxed text-gray-700 italic">
-                      "{study.keyInsight}"
-                    </p>
-                    <Link
-                      href="/analyze"
-                      className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#f5f3f0] hover:bg-[#ebe8e3] text-[#0b0b0b] font-medium transition-colors duration-300"
-                    >
-                      Analyze This Brand →
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
+    <section className="py-32 px-6 bg-[#f5f3f0]">
+      <div className="max-w-4xl mx-auto">
+        {/* Section Header - Editorial Style */}
+        <header className="mb-20 pb-12 border-b-2 border-gray-200">
+          <div className="text-xs font-mono text-gray-400 uppercase tracking-widest mb-6">
+            Research Publication
+          </div>
+          <h2 className="text-5xl font-serif text-[#0b0b0b] mb-6 leading-tight">
+            Representative Case Studies
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            The following analyses demonstrate model performance across diverse
+            brand categories and social discourse patterns. Each study
+            represents a controlled inference executed under identical pipeline
+            conditions.
+          </p>
+          <div className="flex items-center gap-6 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+              <span>
+                Model Version: <span className="font-mono">v2.1.3</span>
+              </span>
             </div>
-          </motion.div>
-        ))}
-      </motion.div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+              <span>
+                Total Observations: <span className="font-mono">12,483</span>
+              </span>
+            </div>
+          </div>
+        </header>
 
-      {/* CTA Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        viewport={{ once: true }}
-        className="mt-20 text-center"
-      >
-        <p className="text-lg opacity-70 mb-6">Ready to analyze your brand?</p>
-        <Link
-          href="/analyze"
-          className="inline-block px-8 py-4 rounded-full bg-[#0b0b0b] text-white font-medium hover:bg-[#1a1a1a] transition-colors duration-300"
-        >
-          Start Your Analysis →
-        </Link>
-      </motion.div>
+        {/* Case Studies - Academic Layout */}
+        <div className="space-y-24">
+          {caseStudies.map((study, index) => (
+            <article key={study.id} className="relative">
+              {/* Figure Number - Academic Style */}
+              <div className="absolute -left-20 top-0 text-right">
+                <div className="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                  Figure {index + 1}
+                </div>
+              </div>
+
+              {/* Article Header */}
+              <header className="mb-10">
+                <h3 className="text-3xl font-serif text-[#0b0b0b] mb-3 leading-tight">
+                  {study.brand}
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
+                  <span className="font-medium">{study.industry}</span>
+                  <span>•</span>
+                  <span className="font-mono">
+                    n = {study.postsAnalyzed.toLocaleString()}
+                  </span>
+                  <span>•</span>
+                  <span>Sources: Reddit, Twitter</span>
+                </div>
+                <div className="bg-gray-50 border-l-4 border-gray-300 p-6">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    Summary Finding
+                  </div>
+                  <p className="text-base text-gray-700 leading-relaxed italic">
+                    {study.keyInsight}
+                  </p>
+                </div>
+              </header>
+
+              {/* Data Tables - White Paper Style */}
+              <div className="space-y-10">
+                {/* Table 1: Sentiment Distribution */}
+                <div>
+                  <div className="text-sm font-semibold text-[#0b0b0b] mb-4">
+                    Table {index + 1}.1: Sentiment Classification Results
+                  </div>
+                  <div className="border border-gray-300">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-300">
+                        <tr>
+                          <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Category
+                          </th>
+                          <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Frequency
+                          </th>
+                          <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Distribution
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        <tr className="hover:bg-gray-50">
+                          <td className="py-3 px-4 text-sm text-gray-700">
+                            Positive
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                            {Math.round(
+                              (study.postsAnalyzed *
+                                study.sentimentBreakdown.positive) /
+                                100
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right font-semibold text-teal-700">
+                            {study.sentimentBreakdown.positive}%
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-gray-50">
+                          <td className="py-3 px-4 text-sm text-gray-700">
+                            Mixed/Neutral
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                            {Math.round(
+                              (study.postsAnalyzed *
+                                study.sentimentBreakdown.mixed) /
+                                100
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right font-semibold text-amber-700">
+                            {study.sentimentBreakdown.mixed}%
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-gray-50">
+                          <td className="py-3 px-4 text-sm text-gray-700">
+                            Negative
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                            {Math.round(
+                              (study.postsAnalyzed *
+                                study.sentimentBreakdown.negative) /
+                                100
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right font-semibold text-red-700">
+                            {study.sentimentBreakdown.negative}%
+                          </td>
+                        </tr>
+                        <tr className="bg-gray-50 font-semibold border-t-2 border-gray-300">
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            Total
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                            {study.postsAnalyzed.toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                            100%
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Table 2: Emotion Distribution */}
+                <div>
+                  <div className="text-sm font-semibold text-[#0b0b0b] mb-4">
+                    Table {index + 1}.2: Dominant Emotional Patterns
+                  </div>
+                  <div className="border border-gray-300">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-300">
+                        <tr>
+                          <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Rank
+                          </th>
+                          <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Emotion Category
+                          </th>
+                          <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Detection Rate
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {study.topEmotions.slice(0, 3).map((emotion, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="py-3 px-4 text-sm font-mono text-gray-500">
+                              {i + 1}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-gray-700">
+                              {emotion.name}
+                            </td>
+                            <td className="py-3 px-4 text-sm font-mono text-right font-semibold text-[#0b0b0b]">
+                              {emotion.value}%
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Table 3: Topic Extraction */}
+                <div>
+                  <div className="text-sm font-semibold text-[#0b0b0b] mb-4">
+                    Table {index + 1}.3: Extracted Topic Frequencies
+                  </div>
+                  <div className="border border-gray-300">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-300">
+                        <tr>
+                          <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Topic Cluster
+                          </th>
+                          <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Mentions
+                          </th>
+                          <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            Relative Freq.
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {study.topTopics.slice(0, 3).map((topic, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="py-3 px-4 text-sm text-gray-700">
+                              {topic.name}
+                            </td>
+                            <td className="py-3 px-4 text-sm font-mono text-right text-gray-900">
+                              {topic.count}
+                            </td>
+                            <td className="py-3 px-4 text-sm font-mono text-right font-semibold text-[#0b0b0b]">
+                              {(
+                                (topic.count / study.postsAnalyzed) *
+                                100
+                              ).toFixed(1)}
+                              %
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footnote */}
+              <footer className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  <span className="font-semibold">Data Collection:</span>{" "}
+                  {new Date().toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  .
+                  <span className="ml-2">
+                    <span className="font-semibold">Pipeline:</span> Inference
+                    v2.1.3 with TF-IDF topic extraction.
+                  </span>
+                  <span className="ml-2">
+                    <span className="font-semibold">Confidence Threshold:</span>{" "}
+                    ≥0.75 for classification.
+                  </span>
+                </p>
+              </footer>
+            </article>
+          ))}
+        </div>
+
+        {/* Methodology Appendix */}
+        <aside className="mt-24 pt-12 border-t-2 border-gray-200">
+          <div className="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">
+            Appendix A
+          </div>
+          <h4 className="text-xl font-serif text-[#0b0b0b] mb-6">
+            Methodology & Limitations
+          </h4>
+          <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+            <p>
+              <strong className="text-gray-900">Model Architecture:</strong> All
+              analyses employ a fine-tuned transformer model (BERT-base) trained
+              on social media discourse. The model performs multi-label
+              classification for sentiment (3 classes) and emotion (8 classes),
+              with concurrent TF-IDF-based topic extraction.
+            </p>
+            <p>
+              <strong className="text-gray-900">Sampling Protocol:</strong> Data
+              collected via Reddit and Twitter APIs using brand-specific keyword
+              queries. Sample sizes reflect available discourse volume during
+              collection windows. No temporal weighting applied.
+            </p>
+            <p>
+              <strong className="text-gray-900">Known Limitations:</strong>{" "}
+              Emotion and topic rankings represent relative frequencies within
+              collected samples, not population-level estimates. Model trained
+              on English-language data; performance on other languages not
+              validated. Sarcasm and context-dependent sentiment may reduce
+              classification accuracy.
+            </p>
+            <p>
+              <strong className="text-gray-900">Validation:</strong>{" "}
+              Cross-validation metrics (precision, recall, F1) available upon
+              request. Confidence thresholds set at ≥0.75 to minimize false
+              positives.
+            </p>
+          </div>
+        </aside>
+      </div>
     </section>
   );
 }

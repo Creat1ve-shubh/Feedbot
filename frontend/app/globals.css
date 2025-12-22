@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: auto; /* Let Lenis handle smooth scrolling */
+}
+
 html, body {
   height: 100%;
   margin: 0;

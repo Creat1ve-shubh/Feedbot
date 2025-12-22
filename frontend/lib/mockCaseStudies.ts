@@ -1,3 +1,5 @@
+import { IconBolt, IconCar, IconShoppingBag } from "@tabler/icons-react";
+
 export const caseStudies = [
   {
     id: 1,
@@ -23,7 +25,8 @@ export const caseStudies = [
     ],
     keyInsight:
       "Nike customers are highly engaged with athletic performance and innovation messaging. Strong positive sentiment around sustainability initiatives.",
-    color: "from-blue-400 to-blue-600",
+    gradientBg: "bg-gradient-to-br from-orange-500 via-red-500 to-red-700",
+    icon: IconBolt,
   },
   {
     id: 2,
@@ -49,33 +52,35 @@ export const caseStudies = [
     ],
     keyInsight:
       "Tesla followers show strong interest in cutting-edge technology, with debates around autonomous capabilities. Mixed sentiment on recent announcements.",
-    color: "from-red-400 to-red-600",
+    gradientBg: "bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700",
+    icon: IconCar,
   },
   {
     id: 3,
-    brand: "Apple",
-    industry: "Consumer Technology",
-    postsAnalyzed: 4156,
+    brand: "Louis Vuitton",
+    industry: "Luxury & Fashion",
+    postsAnalyzed: 1956,
     sentimentBreakdown: {
-      positive: 71,
-      negative: 15,
-      mixed: 14,
+      positive: 72,
+      negative: 12,
+      mixed: 16,
     },
     topEmotions: [
-      { name: "Delight", value: 38 },
-      { name: "Loyalty", value: 32 },
-      { name: "Anticipation", value: 20 },
-      { name: "Frustration", value: 10 },
+      { name: "Aspiration", value: 38 },
+      { name: "Admiration", value: 32 },
+      { name: "Exclusivity", value: 20 },
+      { name: "Skepticism", value: 10 },
     ],
     topTopics: [
-      { topic: "Product Design", posts: 620 },
-      { topic: "Innovation", posts: 550 },
-      { topic: "User Experience", posts: 480 },
-      { topic: "Ecosystem Integration", posts: 420 },
+      { topic: "Collection Launches", posts: 320 },
+      { topic: "Celebrity Endorsements", posts: 280 },
+      { topic: "Heritage", posts: 210 },
+      { topic: "Sustainability", posts: 180 },
     ],
     keyInsight:
-      "Apple maintains strong brand loyalty with customers delighted by design and ecosystem integration. Highest positive sentiment among analyzed brands.",
-    color: "from-gray-400 to-gray-600",
+      "Strong aspirational sentiment around new collections and celebrity collaborations. Luxury positioning resonates well with audience expectations.",
+    gradientBg: "bg-gradient-to-br from-amber-600 via-yellow-600 to-yellow-800",
+    icon: IconShoppingBag,
   },
 ];
 
