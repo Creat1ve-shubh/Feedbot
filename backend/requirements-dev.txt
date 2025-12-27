@@ -9,7 +9,7 @@ redis==5.0.8
 celery==5.4.0
 httpx==0.27.2
 beautifulsoup4==4.12.3
-praw==7.7.1
+praw==7.8.1
 tweepy==4.14.0
 # ML layer omitted for dev speed. Install later with:
 # pip install torch==2.9.0 transformers==4.44.0 scikit-learn==1.6.1 pandas==2.2.3 numpy==2.2.0
