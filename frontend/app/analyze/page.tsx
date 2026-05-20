@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
 import { motion } from "motion/react";
 import { useBrandStore } from "@/store/brandStore";
 import AnalysisForm from "@/components/forms/AnalysisForm";
+import AnalysisStepper from "@/components/AnalysisStepper";
 import {
   IconChartBar,
   IconSparkles,
@@ -16,8 +16,7 @@ import {
 import Link from "next/link";
 
 export default function AnalyzePage() {
-  const { isLoading, brand, error } = useBrandStore();
-  const [submitted, setSubmitted] = useState(false);
+  const { isLoading, brand, error, analysisStep } = useBrandStore();
 
   return (
     <div className="min-h-screen bg-[#fafaf9]">
@@ -61,7 +60,7 @@ export default function AnalyzePage() {
                   Configure inference parameters
                 </p>
               </div>
-              <AnalysisForm onSubmitted={() => setSubmitted(true)} />
+              <AnalysisForm />
 
               {/* Model Metadata */}
               <div className="mt-6 pt-6 border-t border-gray-200">
@@ -101,56 +100,9 @@ export default function AnalyzePage() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-3 space-y-4"
           >
-            {/* Loading State */}
-            {isLoading && (
-              <div className="bg-white border-2 border-indigo-200 rounded-lg p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <div className="animate-spin text-indigo-600">
-                      <IconLoader size={20} />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-[#0b0b0b]">
-                        Inference Running
-                      </h3>
-                      <span className="text-xs font-mono text-gray-500">
-                        Target: {brand}
-                      </span>
-                    </div>
-                    <div className="space-y-2.5 text-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full" />
-                        <span className="text-gray-700">
-                          Data collection from sources
-                        </span>
-                        <span className="ml-auto text-xs font-mono text-gray-500">
-                          ~15s
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-                        <span className="text-gray-700">
-                          Model inference (sentiment, emotion, topic)
-                        </span>
-                        <span className="ml-auto text-xs font-mono text-gray-500">
-                          ~30s
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 bg-gray-300 rounded-full" />
-                        <span className="text-gray-500">
-                          Result aggregation
-                        </span>
-                        <span className="ml-auto text-xs font-mono text-gray-400">
-                          pending
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Pipeline Stepper — shown as soon as analysis starts */}
+            {analysisStep !== "idle" && (
+              <AnalysisStepper currentStep={analysisStep} brand={brand} />
             )}
 
             {/* Error State */}
@@ -178,8 +130,8 @@ export default function AnalyzePage() {
               </div>
             )}
 
-            {/* Success State */}
-            {(brand || submitted) && !isLoading && !error && (
+            {/* Success State — only when pipeline is fully done */}
+            {analysisStep === "done" && brand && !error && (
               <div className="bg-white border-2 border-teal-200 rounded-lg p-6">
                 <div className="flex items-start gap-4">
                   <IconCheck
@@ -201,10 +153,10 @@ export default function AnalyzePage() {
                         </p>
                       </div>
                       <Link
-                        href={`/insights?brand=${brand}`}
+                        href={`/Dashboard?brand=${encodeURIComponent(brand)}`}
                         className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 bg-[#0b0b0b] hover:bg-gray-800 text-white text-sm font-medium rounded transition-colors"
                       >
-                        View Output
+                        View Dashboard
                         <IconArrowRight size={16} />
                       </Link>
                     </div>

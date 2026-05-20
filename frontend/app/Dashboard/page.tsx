@@ -14,6 +14,8 @@ import {
   IconLoader,
   IconDatabase,
   IconFilter,
+  IconArrowLeft,
+  IconChartBar,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -52,17 +54,23 @@ export default function DashboardPage() {
   const sp = useSearchParams();
   const brand = sp.get("brand") || "";
   const [searchInput, setSearchInput] = useState(brand);
+  const [filterSentiment, setFilterSentiment] = useState<string>("All");
+  const [filterOpen, setFilterOpen] = useState(false);
   const { data, isLoading, error, mutate } = useSWR(
     brand ? `/api/results?brand=${brand}` : null,
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000 },
   );
 
-  const rows: any[] = Array.isArray(data) ? data : [];
-  const total = rows.length;
-  const pos = rows.filter((d) => d.sentiment === "Positive").length;
-  const neg = rows.filter((d) => d.sentiment === "Negative").length;
-  const neu = rows.filter((d) => d.sentiment === "Neutral").length;
+  const allRows: any[] = Array.isArray(data) ? data : [];
+  const rows: any[] =
+    filterSentiment === "All"
+      ? allRows
+      : allRows.filter((r) => r.sentiment === filterSentiment);
+  const total = allRows.length;
+  const pos = allRows.filter((d) => d.sentiment === "Positive").length;
+  const neg = allRows.filter((d) => d.sentiment === "Negative").length;
+  const neu = allRows.filter((d) => d.sentiment === "Neutral").length;
   const posPct = total ? Math.round((pos / total) * 100) : 0;
   const negPct = total ? Math.round((neg / total) * 100) : 0;
   const neuPct = total ? Math.round((neu / total) * 100) : 0;
@@ -74,6 +82,25 @@ export default function DashboardPage() {
     window.location.href = url.toString();
   };
 
+  const exportCSV = () => {
+    if (!rows.length) return;
+    const headers = Object.keys(rows[0]).join(",");
+    const body = rows
+      .map((r) =>
+        Object.values(r)
+          .map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`)
+          .join(","),
+      )
+      .join("\n");
+    const blob = new Blob([`${headers}\n${body}`], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `feedbot-${brand}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-[#fafaf9]">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -83,6 +110,16 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-12 pb-8 border-b-2 border-gray-200"
         >
+          {/* Breadcrumb */}
+          <div className="mb-5">
+            <Link
+              href="/analyze"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[#0b0b0b] transition-colors"
+            >
+              <IconArrowLeft size={13} />
+              New Analysis
+            </Link>
+          </div>
           <div className="flex items-center justify-between mb-6">
             <div>
               <div className="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">
@@ -126,11 +163,12 @@ export default function DashboardPage() {
                 Refresh
               </button>
               <button
+                onClick={exportCSV}
                 disabled={!brand || rows.length === 0}
                 className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors text-sm font-medium"
               >
                 <IconDownload size={16} />
-                Export
+                Export CSV
               </button>
             </div>
           </div>
@@ -141,19 +179,26 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white border-2 border-gray-300 p-8"
+            className="bg-white border-2 border-gray-200 rounded-lg p-12"
           >
-            <div className="text-center">
+            <div className="text-center max-w-sm mx-auto">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <IconChartBar size={24} className="text-gray-400" />
+              </div>
               <h3 className="font-semibold text-[#0b0b0b] mb-2">
                 No Active Query
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Enter a brand name above or{" "}
-                <Link href="/analyze" className="underline font-medium">
-                  initiate new inference
-                </Link>{" "}
-                to populate dashboard.
+              <p className="text-sm text-gray-500 mb-5">
+                Search for a brand above, or run a fresh analysis to populate
+                this dashboard.
               </p>
+              <Link
+                href="/analyze"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0b0b0b] hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-colors"
+              >
+                Start New Analysis
+                <IconArrowLeft size={14} className="rotate-180" />
+              </Link>
             </div>
           </motion.div>
         )}
@@ -208,7 +253,7 @@ export default function DashboardPage() {
         )}
 
         {/* Metrics Grid */}
-        {brand && rows.length > 0 && (
+        {brand && allRows.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -243,7 +288,7 @@ export default function DashboardPage() {
         )}
 
         {/* Visualization Panels */}
-        {brand && rows.length > 0 && (
+        {brand && allRows.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -264,7 +309,7 @@ export default function DashboardPage() {
                     n={total}
                   </span>
                 </div>
-                <SentimentPie data={rows} />
+                <SentimentPie data={allRows} />
               </div>
 
               <div className="bg-white border border-gray-300 p-6">
@@ -274,7 +319,7 @@ export default function DashboardPage() {
                   </h3>
                   <span className="text-xs font-mono text-gray-500">Top 5</span>
                 </div>
-                <EmotionBar data={rows} />
+                <EmotionBar data={allRows} />
               </div>
 
               <div className="bg-white border border-gray-300 p-6">
@@ -286,14 +331,14 @@ export default function DashboardPage() {
                     TF-IDF
                   </span>
                 </div>
-                <TopicBar data={rows} />
+                <TopicBar data={allRows} />
               </div>
             </div>
           </motion.div>
         )}
 
         {/* Raw Data Table */}
-        {brand && rows.length > 0 && (
+        {brand && allRows.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -307,13 +352,44 @@ export default function DashboardPage() {
                     Observation Data
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Raw inference results with confidence scores
+                    {filterSentiment === "All"
+                      ? `${allRows.length} total results`
+                      : `${rows.length} of ${allRows.length} — filtered to ${filterSentiment}`}
                   </p>
                 </div>
-                <button className="flex items-center gap-2 px-3 py-2 text-xs font-medium border border-gray-300 hover:bg-gray-50">
-                  <IconFilter size={14} />
-                  Filter
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setFilterOpen((o) => !o)}
+                    className={`flex items-center gap-2 px-3 py-2 text-xs font-medium border transition-colors ${
+                      filterSentiment !== "All"
+                        ? "border-[#0b0b0b] bg-[#0b0b0b] text-white"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <IconFilter size={14} />
+                    {filterSentiment === "All" ? "Filter" : filterSentiment}
+                  </button>
+                  {filterOpen && (
+                    <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-200 shadow-lg z-10">
+                      {["All", "Positive", "Negative", "Neutral"].map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => {
+                            setFilterSentiment(s);
+                            setFilterOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 ${
+                            filterSentiment === s
+                              ? "font-semibold text-[#0b0b0b]"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="p-6">
@@ -323,7 +399,7 @@ export default function DashboardPage() {
         )}
 
         {/* Metadata Footer */}
-        {brand && rows.length > 0 && (
+        {brand && allRows.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

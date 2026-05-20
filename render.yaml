@@ -1,0 +1,62 @@
+databases:
+  - name: feedbot-db
+    databaseName: branddb
+    user: postgres
+    plan: free
+
+services:
+  - type: redis
+    name: feedbot-redis
+    plan: free # Note: Render free Redis does not persist data and might be deprecated. You may need a paid tier or an Upstash Redis URL.
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: feedbot-api
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile.api
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: feedbot-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: feedbot-redis
+          property: connectionString
+      - key: ML_MODEL_PATH
+        value: ./models/model_traced.pt
+
+  - type: worker
+    name: feedbot-worker
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile.worker
+    plan: starter # ML models usually require more than 512MB RAM, so the starter tier ($7/mo) is recommended here.
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: feedbot-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: feedbot-redis
+          property: connectionString
+      - key: ML_MODEL_PATH
+        value: ./models/model_traced.pt
+
+  - type: web
+    name: feedbot-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm run start
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: feedbot-api
+          property: url

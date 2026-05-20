@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   IconBrandReddit,
   IconBrandX,
@@ -21,6 +22,33 @@ const schema = z.object({
 
 export type AnalysisInput = z.infer<typeof schema>;
 
+/** Simulate pipeline step progression then redirect */
+async function runStepSequence(
+  step: (
+    s: ReturnType<typeof useBrandStore.getState>["setAnalysisStep"] extends (
+      s: infer S,
+    ) => void
+      ? S
+      : never,
+  ) => void,
+  brand: string,
+  router: ReturnType<typeof useRouter>,
+) {
+  step("scraping");
+  await delay(3500);
+  step("inferring");
+  await delay(6000);
+  step("aggregating");
+  await delay(2000);
+  step("done");
+  await delay(900); // brief "done" display
+  router.push(`/Dashboard?brand=${encodeURIComponent(brand)}`);
+}
+
+function delay(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 export default function AnalysisForm({
   defaultValues,
   onSubmitted,
@@ -28,8 +56,10 @@ export default function AnalysisForm({
   defaultValues?: Partial<AnalysisInput>;
   onSubmitted?: (v: any) => void;
 }) {
-  const { setBrand, setLoading } = useBrandStore();
+  const { setBrand, setLoading, setAnalysisStep, setError, setTaskId, reset } =
+    useBrandStore();
   const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -50,8 +80,11 @@ export default function AnalysisForm({
 
   async function onSubmit(values: AnalysisInput) {
     setServerError(null);
+    setError(null);
     setBrand(values.brand);
     setLoading(true);
+    setAnalysisStep("scraping");
+
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -62,9 +95,17 @@ export default function AnalysisForm({
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || `Request failed (${res.status})`);
       }
-      onSubmitted?.(await res.json().catch(() => ({})));
+      const json = await res.json().catch(() => ({}));
+      if (json?.task_id) setTaskId(json.task_id);
+
+      // Animate through pipeline steps, then navigate
+      runStepSequence(setAnalysisStep, values.brand, router);
+      onSubmitted?.(json);
     } catch (e: any) {
-      setServerError(e?.message || "Failed to start analysis");
+      const msg = e?.message || "Failed to start analysis";
+      setServerError(msg);
+      setError(msg);
+      setAnalysisStep("error");
     } finally {
       setLoading(false);
     }

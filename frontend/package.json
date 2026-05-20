@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:api": "node scripts/check-api.mjs",
+    "check:routes": "node scripts/lint-routes.mjs",
+    "seed": "node scripts/seed-dev.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
