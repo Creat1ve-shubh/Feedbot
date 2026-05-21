@@ -1,23 +1,17 @@
-name: Build and Push Docker Images
+name: Build, Push and Deploy
 
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
   pull_request:
     branches: [main]
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: shubh2047/feedbot
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     
     strategy:
       matrix:
@@ -29,25 +23,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: Log in to Container Registry
+      - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=raw,value=${{ matrix.service }}-latest
+            type=raw,value=${{ matrix.service }}-${{ github.sha }}
+            type=raw,value=${{ matrix.service }}-main,enable=${{ github.ref == 'refs/heads/main' }}
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -59,4 +50,26 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+
+  deploy-to-render:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render API Deployment
+        run: |
+          if [ -n "${{ secrets.RENDER_API_DEPLOY_HOOK }}" ]; then
+            echo "Triggering API Deploy Hook..."
+            curl -X POST "${{ secrets.RENDER_API_DEPLOY_HOOK }}"
+          else
+            echo "RENDER_API_DEPLOY_HOOK secret is not set, skipping API deploy"
+          fi
+
+      - name: Trigger Render Worker Deployment
+        run: |
+          if [ -n "${{ secrets.RENDER_WORKER_DEPLOY_HOOK }}" ]; then
+            echo "Triggering Worker Deploy Hook..."
+            curl -X POST "${{ secrets.RENDER_WORKER_DEPLOY_HOOK }}"
+          else
+            echo "RENDER_WORKER_DEPLOY_HOOK secret is not set, skipping worker deploy"
+          fi

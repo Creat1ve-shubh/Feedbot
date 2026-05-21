@@ -12,9 +12,9 @@ services:
 
   - type: web
     name: feedbot-api
-    env: docker
-    dockerContext: ./backend
-    dockerfilePath: ./backend/Dockerfile.api
+    env: image
+    image:
+      url: docker.io/shubh2047/feedbot:api-latest
     plan: free
     envVars:
       - key: DATABASE_URL
@@ -31,9 +31,9 @@ services:
 
   - type: worker
     name: feedbot-worker
-    env: docker
-    dockerContext: ./backend
-    dockerfilePath: ./backend/Dockerfile.worker
+    env: image
+    image:
+      url: docker.io/shubh2047/feedbot:worker-latest
     plan: starter # ML models usually require more than 512MB RAM, so the starter tier ($7/mo) is recommended here.
     envVars:
       - key: DATABASE_URL
