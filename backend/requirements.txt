@@ -15,7 +15,7 @@ beautifulsoup4==4.12.3
 
 # Reddit + Twitter API clients (optional; you can swap for your own)
 praw==7.7.1
-tweepy==4.14.0
+tweepy==4.16.0
 
 # ML deps (keep light; replace with your real stack when ready)
 # Torch CPU-only (much smaller than CUDA version)
